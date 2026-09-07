@@ -74,7 +74,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Main Banner Header (Updated Subtitle)
+# Main Banner Header
 st.markdown("""
     <div class="sirius-header">
         <div class="sirius-title">⚡ SIRIUS</div>
@@ -82,17 +82,17 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# SIDEBAR CONTROLS (Updated Header)
+# SIDEBAR CONTROLS
 st.sidebar.title("🏢 Select account")
 selected_customer = st.sidebar.selectbox(
     "1. Select Enterprise Customer",
     ["Zomato", "McDonald's", "Honda"]
 )
 
-# View Selection Dropdown
+# View Selection Dropdown (Added 'Escalations')
 view_option = st.sidebar.selectbox(
     f"2. Select View for {selected_customer}",
-    ["Executive Overview", "Adoption & Utilization", "KPI Reports", "Surveys & Feedback"]
+    ["Executive Overview", "Adoption & Utilization", "KPI Reports", "Surveys & Feedback", "Escalations"]
 )
 
 # Comprehensive Dataset
@@ -124,6 +124,10 @@ DATA = {
         "surveys": [
             {"nps": "88 (Promoter)", "csat": "4.8 / 5.0", "feedback": "Automated tech screening reduced our engineering recruiter workload significantly."},
             {"nps": "82 (Promoter)", "csat": "4.6 / 5.0", "feedback": "Smooth UI and easy candidate invite link generation."}
+        ],
+        "escalations": [
+            {"id": "ESC-1092", "priority": "🟡 Medium", "issue": "Bulk ATS candidate export sync delay during peak volume hours.", "status": "In Progress", "owner": "Engineering Lead"},
+            {"id": "ESC-1045", "priority": "🟢 Low", "issue": "Custom role taxonomy request for quick-commerce operational leads.", "status": "Resolved", "owner": "CSM Team"}
         ],
         "events": "Q2 earnings revealed 28% growth in quick-commerce segment (Blinkit).",
         "hiring": "Massive hiring spree across NCR & Bengaluru for logistics automation roles.",
@@ -166,6 +170,10 @@ DATA = {
             {"nps": "65 (Passive)", "csat": "3.9 / 5.0", "feedback": "Store managers are focused on kiosk upgrades, leaving less time for routine assessments."},
             {"nps": "70 (Passive)", "csat": "4.1 / 5.0", "feedback": "Platform is useful, but mobile workflow needs to be faster for store leads."}
         ],
+        "escalations": [
+            {"id": "ESC-1120", "priority": "🔴 High", "issue": "Mobile login timeouts reported by regional store leads in West Zone.", "status": "Under Investigation", "owner": "DevOps / Support"},
+            {"id": "ESC-1088", "priority": "🟡 Medium", "issue": "Franchise portal reporting mismatch on store completion status.", "status": "In Progress", "owner": "Product Support"}
+        ],
         "events": "Announced nationwide digital drive-thru and self-ordering kiosk upgrades.",
         "hiring": "Frontline digital literacy upskilling drives across regional franchises.",
         "leadership": "ABC appointed as CHRO to lead franchise digital workforce capability.",
@@ -206,6 +214,10 @@ DATA = {
         "surveys": [
             {"nps": "45 (Detractor)", "csat": "3.1 / 5.0", "feedback": "Our main training lead left, and the software needs re-alignment with new EV software roles."},
             {"nps": "50 (Passive)", "csat": "3.4 / 5.0", "feedback": "Need custom EV technical skill modules."}
+        ],
+        "escalations": [
+            {"id": "ESC-1155", "priority": "🔴 Critical", "issue": "Lack of admin access after Champion PQR departure stalled EV module deployment.", "status": "Pending Client Action", "owner": "Account Director"},
+            {"id": "ESC-1102", "priority": "🔴 High", "issue": "Security compliance audit flag on multi-tenant deployment model.", "status": "Under Review", "owner": "InfoSec Team"}
         ],
         "events": "EV shift mandate initiated across R&D and assembly plants.",
         "hiring": "Hiring freeze on traditional IC engine roles; hiring surge for EV software engineers.",
@@ -389,6 +401,30 @@ elif view_option == "Surveys & Feedback":
                     <div><strong>CSAT Rating:</strong> {survey['csat']}</div>
                 </div>
                 <p style="margin:0; font-style:italic; color:#334155;">"{survey['feedback']}"</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+# VIEW 5: ESCALATIONS (NEWLY ADDED)
+elif view_option == "Escalations":
+    st.markdown(f"### 🚨 Active Escalations & Issue Tracking: {selected_customer}")
+    st.caption("Log of critical support tickets, product issues, and operational blockers")
+    
+    esc_df = pd.DataFrame(cust["escalations"])
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    for esc in cust["escalations"]:
+        border_color = "#DC2626" if "Critical" in esc['priority'] or "High" in esc['priority'] else "#D97706"
+        st.markdown(f"""
+            <div class="card-box" style="border-left: 5px solid {border_color};">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-weight:700; font-size:1.05rem; color:#0F172A;">Ticket ID: {esc['id']}</span>
+                    <span><strong>Priority:</strong> {esc['priority']}</span>
+                </div>
+                <p style="margin:6px 0; font-size:1rem;"><strong>Issue Summary:</strong> {esc['issue']}</p>
+                <div style="display:flex; gap:30px; font-size:0.85rem; color:#64748B; margin-top:8px;">
+                    <span><strong>Status:</strong> {esc['status']}</span>
+                    <span><strong>Assigned Owner:</strong> {esc['owner']}</span>
+                </div>
             </div>
         """, unsafe_allow_html=True)
 
