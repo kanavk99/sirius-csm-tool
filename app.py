@@ -1,6 +1,5 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 
 # Page Configuration
@@ -10,19 +9,51 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom Styling
+# Custom Styling to Fix Overflow and Beautify
 st.markdown("""
     <style>
+    /* Header Banner */
     .sirius-header {
-        background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
         color: #FFFFFF;
-        padding: 24px;
+        padding: 20px 24px;
         border-radius: 12px;
         margin-bottom: 25px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    .sirius-title { font-size: 2.4rem; font-weight: 800; color: #38BDF8; margin: 0; }
-    .sirius-subtitle { font-size: 1.05rem; color: #94A3B8; margin-top: 5px; }
+    .sirius-title { font-size: 2.2rem; font-weight: 800; color: #38BDF8; margin: 0; }
+    .sirius-subtitle { font-size: 0.95rem; color: #94A3B8; margin-top: 4px; }
+    
+    /* Overview Cards */
+    .overview-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        height: 100%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .overview-label { font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+    .overview-value { font-size: 1.15rem; font-weight: 700; color: #0F172A; word-break: break-word; }
+
+    /* Stakeholder Cards */
+    .stk-card {
+        padding: 14px;
+        border-radius: 8px;
+        border-left: 4px solid;
+        min-height: 90px;
+        margin-bottom: 10px;
+    }
+    .stk-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stk-name { font-size: 0.95rem; font-weight: 600; word-wrap: break-word; line-height: 1.3; }
+
+    .stk-decision { background-color: #EFF6FF; border-color: #2563EB; color: #1E40AF; }
+    .stk-influencer { background-color: #ECFDF5; border-color: #059669; color: #065F46; }
+    .stk-champion { background-color: #FEFCE8; border-color: #D97706; color: #92400E; }
+    .stk-user { background-color: #F3E8FF; border-color: #7C3AED; color: #5B21B6; }
+    .stk-blocker { background-color: #FEF2F2; border-color: #DC2626; color: #991B1B; }
+
+    /* General Cards */
     .card-box {
         background-color: #FFFFFF;
         border: 1px solid #E2E8F0;
@@ -31,14 +62,13 @@ st.markdown("""
         margin-bottom: 15px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .badge-risk { background-color: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
-    .badge-growth { background-color: #DCFCE7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
-    .badge-insight { background-color: #E0F2FE; color: #075985; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+    
     .ai-box {
         background-color: #F0FDF4;
-        border-left: 4px solid #16A34A;
-        padding: 18px;
-        border-radius: 8px;
+        border: 1px solid #BBF7D0;
+        border-left: 5px solid #16A34A;
+        padding: 20px;
+        border-radius: 10px;
         margin-bottom: 15px;
     }
     </style>
@@ -48,7 +78,7 @@ st.markdown("""
 st.markdown("""
     <div class="sirius-header">
         <div class="sirius-title">⚡ SIRIUS</div>
-        <div class="sirius-subtitle">Enterprise Customer Intelligence, Data Analytics & Stakeholder Dashboard</div>
+        <div class="sirius-subtitle">Enterprise Customer Intelligence & Stakeholder Mapping Dashboard</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -152,28 +182,86 @@ DATA = {
 
 cust = DATA[selected_customer]
 
-# SECTION 1: CUSTOMER OVERVIEW & HEALTH
+# SECTION 1: CUSTOMER OVERVIEW & HEALTH (Custom Responsive Layout)
 st.markdown("### 📊 1. Customer Overview & Health Status")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Customer Name", selected_customer)
-col2.metric("Annual Contract Value", cust["acv"])
-col3.metric("Health Score Status", cust["health_status"])
-col4.metric("Renewal / Stage", f"{cust['renewal']} | {cust['stage']}")
 
+c1, c2, c3, c4 = st.columns([1, 1, 1, 1.3])
+with c1:
+    st.markdown(f"""
+        <div class="overview-card">
+            <div class="overview-label">Customer Name</div>
+            <div class="overview-value">{selected_customer}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with c2:
+    st.markdown(f"""
+        <div class="overview-card">
+            <div class="overview-label">Annual Contract Value</div>
+            <div class="overview-value">{cust['acv']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with c3:
+    st.markdown(f"""
+        <div class="overview-card">
+            <div class="overview-label">Health Score</div>
+            <div class="overview-value">{cust['health_status']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with c4:
+    st.markdown(f"""
+        <div class="overview-card">
+            <div class="overview-label">Renewal / Stage</div>
+            <div class="overview-value">{cust['renewal']} <span style="font-size:0.85rem; color:#64748B;">({cust['stage']})</span></div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
 st.divider()
 
-# SECTION 2: ENTERPRISE STAKEHOLDER MATRIX & PIE CHART
+# SECTION 2: ENTERPRISE STAKEHOLDER MATRIX (Responsive Cards)
 st.markdown("### 👥 2. Enterprise Stakeholder Mapping")
-st.caption("Mapped roles and stakeholder balance within the account")
+st.caption("Mapped roles and internal influence structure")
 
 stk = cust["stakeholders"]
-s_col1, s_col2, s_col3, s_col4, s_col5 = st.columns(5)
-s_col1.info(f"**Decision-Maker**\n\n{stk['Decision-maker']}")
-s_col2.success(f"**Influencer**\n\n{stk['Influencer']}")
-s_col3.warning(f"**Champion**\n\n{stk['Champion']}")
-s_col4.metric("Users", stk['User'])
-s_col5.error(f"**Blocker**\n\n{stk['Blocker']}")
+s1, s2, s3, s4, s5 = st.columns(5)
 
+with s1:
+    st.markdown(f"""
+        <div class="stk-card stk-decision">
+            <div class="stk-title">Decision-Maker</div>
+            <div class="stk-name">{stk['Decision-maker']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with s2:
+    st.markdown(f"""
+        <div class="stk-card stk-influencer">
+            <div class="stk-title">Influencer</div>
+            <div class="stk-name">{stk['Influencer']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with s3:
+    st.markdown(f"""
+        <div class="stk-card stk-champion">
+            <div class="stk-title">Champion</div>
+            <div class="stk-name">{stk['Champion']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with s4:
+    st.markdown(f"""
+        <div class="stk-card stk-user">
+            <div class="stk-title">User Lead</div>
+            <div class="stk-name">{stk['User']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+with s5:
+    st.markdown(f"""
+        <div class="stk-card stk-blocker">
+            <div class="stk-title">Blocker</div>
+            <div class="stk-name">{stk['Blocker']}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
 st.divider()
 
 # SECTION 3: VISUAL ANALYTICS (PIE & BAR CHARTS)
@@ -182,7 +270,7 @@ st.markdown("### 📈 3. Customer Intelligence Analytics")
 chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
-    st.markdown("#### 🥧 Stakeholder Distribution (Pie Chart)")
+    st.markdown("#### 🥧 Stakeholder Distribution")
     stk_counts = cust["stakeholder_counts"]
     pie_df = pd.DataFrame({
         "Category": list(stk_counts.keys()),
@@ -195,26 +283,25 @@ with chart_col1:
         values="Count", 
         color="Category",
         color_discrete_map={
-            "Decision-makers": "#3B82F6",
-            "Influencers": "#10B981",
-            "Champions": "#F59E0B",
-            "Users": "#8B5CF6",
-            "Blockers": "#EF4444"
+            "Decision-makers": "#2563EB",
+            "Influencers": "#059669",
+            "Champions": "#D97706",
+            "Users": "#7C3AED",
+            "Blockers": "#DC2626"
         },
         hole=0.4
     )
-    fig_pie.update_layout(margin=dict(t=20, b=20, l=20, r=20), height=300)
+    fig_pie.update_layout(margin=dict(t=20, b=20, l=20, r=20), height=280)
     st.plotly_chart(fig_pie, use_container_width=True)
 
 with chart_col2:
-    st.markdown("#### 📊 5-Month Usage Trend (Bar Chart)")
+    st.markdown("#### 📊 5-Month Usage Trend")
     bar_df = pd.DataFrame({
         "Month": cust["usage_months"],
         "Engagement Score": cust["usage_scores"]
     })
     
-    # Color bar blue if healthy, red/amber if dropping
-    bar_color = "#10B981" if cust["health_score"] >= 75 else ("#F59E0B" if cust["health_score"] >= 60 else "#EF4444")
+    bar_color = "#059669" if cust["health_score"] >= 75 else ("#D97706" if cust["health_score"] >= 60 else "#DC2626")
     
     fig_bar = px.bar(
         bar_df, 
@@ -224,7 +311,7 @@ with chart_col2:
         color_discrete_sequence=[bar_color]
     )
     fig_bar.update_traces(textposition='outside')
-    fig_bar.update_layout(yaxis_range=[0, 100], margin=dict(t=20, b=20, l=20, r=20), height=300)
+    fig_bar.update_layout(yaxis_range=[0, 100], margin=dict(t=20, b=20, l=20, r=20), height=280)
     st.plotly_chart(fig_bar, use_container_width=True)
 
 st.divider()
@@ -235,36 +322,36 @@ st.markdown("### 📡 4. Company Insights & Telemetry Signals")
 grid_col1, grid_col2 = st.columns(2)
 
 with grid_col1:
-    st.markdown("""
+    st.markdown(f"""
         <div class="card-box">
-            <h4>🏢 Company Events & Strategic Developments</h4>
-            <p><strong>Recent Events:</strong> {}</p>
-            <p><strong>News & Strategy:</strong> {}</p>
+            <h4 style="margin-top:0; color:#0F172A;">🏢 Company Events & Strategic Developments</h4>
+            <p><strong>Recent Events:</strong> {cust['events']}</p>
+            <p style="margin-bottom:0;"><strong>News & Strategy:</strong> {cust['news']}</p>
         </div>
-    """.format(cust["events"], cust["news"]), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(f"""
         <div class="card-box">
-            <h4>👔 Hiring Signals & Leadership Changes</h4>
-            <p><strong>Leadership Shifts:</strong> {}</p>
-            <p><strong>Hiring Signals:</strong> {}</p>
+            <h4 style="margin-top:0; color:#0F172A;">👔 Hiring Signals & Leadership Changes</h4>
+            <p><strong>Leadership Shifts:</strong> {cust['leadership']}</p>
+            <p style="margin-bottom:0;"><strong>Hiring Signals:</strong> {cust['hiring']}</p>
         </div>
-    """.format(cust["leadership"], cust["hiring"]), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 with grid_col2:
-    st.markdown("""
+    st.markdown(f"""
         <div class="card-box">
-            <h4>📈 Product & Usage Signals</h4>
-            <p>{}</p>
+            <h4 style="margin-top:0; color:#0F172A;">📈 Product & Usage Signals</h4>
+            <p style="margin-bottom:0;">{cust['usage']}</p>
         </div>
-    """.format(cust["usage"]), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-    st.markdown("""
-        <div class="card-box" style="border-left: 4px solid #EF4444;">
-            <h4>⚠️ Strategic Risks & Growth Opportunities</h4>
-            <p>{}</p>
+    st.markdown(f"""
+        <div class="card-box" style="border-left: 4px solid #DC2626;">
+            <h4 style="margin-top:0; color:#991B1B;">⚠️ Strategic Risks & Growth Opportunities</h4>
+            <p style="margin-bottom:0;">{cust['risks_opps']}</p>
         </div>
-    """.format(cust["risks_opps"]), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 st.divider()
 
@@ -276,13 +363,13 @@ ai = cust["ai_analysis"]
 
 st.markdown(f"""
     <div class="ai-box">
-        <span class="badge-insight">STRATEGIC ACTIONABLE INSIGHT</span>
-        <h3 style="color: #15803D; margin-top: 10px; margin-bottom: 10px;">Signal Briefing: {selected_customer}</h3>
+        <div style="font-size:0.75rem; font-weight:700; color:#15803D; letter-spacing:0.5px; text-transform:uppercase;">STRATEGIC ACTIONABLE INSIGHT</div>
+        <h3 style="color: #15803D; margin-top: 6px; margin-bottom: 12px;">Signal Briefing: {selected_customer}</h3>
         <p><strong>1. What Happened:</strong> {ai['what']}</p>
         <p><strong>2. Why It Matters:</strong> {ai['why']}</p>
         <p><strong>3. Recommended CSM Action:</strong> {ai['action']}</p>
-        <div style="background-color: #FFFFFF; padding: 14px; border-radius: 6px; border: 1px dashed #16A34A; margin-top: 10px;">
-            <p style="margin: 0; color: #166534;"><strong>💬 Suggested Talking Point / Executive Outreach Draft:</strong></p>
+        <div style="background-color: #FFFFFF; padding: 14px; border-radius: 8px; border: 1px dashed #16A34A; margin-top: 12px;">
+            <p style="margin: 0; color: #166534; font-weight:600;">💬 Suggested Talking Point / Executive Outreach Draft:</p>
             <p style="margin: 6px 0 0 0; font-style: italic; color: #334155;">{ai['talking_point']}</p>
         </div>
     </div>
