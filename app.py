@@ -74,22 +74,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Main Banner Header
+# Main Banner Header (Updated Subtitle)
 st.markdown("""
     <div class="sirius-header">
         <div class="sirius-title">⚡ SIRIUS</div>
-        <div class="sirius-subtitle">Enterprise Customer Intelligence & Stakeholder Mapping Dashboard</div>
+        <div class="sirius-subtitle">Enterprise Customer Intelligence Tool</div>
     </div>
 """, unsafe_allow_html=True)
 
-# SIDEBAR CONTROLS
-st.sidebar.title("🏢 Account Controls")
+# SIDEBAR CONTROLS (Updated Header)
+st.sidebar.title("🏢 Select account")
 selected_customer = st.sidebar.selectbox(
     "1. Select Enterprise Customer",
     ["Zomato", "McDonald's", "Honda"]
 )
 
-# Added 'Adoption & Utilization' into the Dropdown List
+# View Selection Dropdown
 view_option = st.sidebar.selectbox(
     f"2. Select View for {selected_customer}",
     ["Executive Overview", "Adoption & Utilization", "KPI Reports", "Surveys & Feedback"]
@@ -277,7 +277,6 @@ if view_option == "Executive Overview":
 
     st.divider()
 
-    # REMOVED ADOPTION METRICS BLOCK FROM THIS SECTION AS REQUESTED
     st.markdown("### 📈 3. Customer Intelligence Analytics")
     chart_col1, chart_col2 = st.columns(2)
 
@@ -331,7 +330,7 @@ if view_option == "Executive Overview":
         </div>
     """, unsafe_allow_html=True)
 
-# NEW VIEW ADDED TO DROPDOWN LIST: ADOPTION & UTILIZATION
+# VIEW 2: ADOPTION & UTILIZATION
 elif view_option == "Adoption & Utilization":
     st.markdown(f"### 📈 Platform Adoption & Seat Utilization: {selected_customer}")
     st.caption("Detailed breakdown of account adoption rate, license allocation, and 5-month engagement trends.")
