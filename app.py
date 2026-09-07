@@ -354,9 +354,8 @@ view_option = st.sidebar.radio(
     ["Portfolio Overview", "Executive Overview", "Adoption & Utilization", "KPI Reports", "Surveys & Feedback", "Escalations"]
 )
 
-selected_customer = None
+selected_customer = st.sidebar.selectbox("🔽 Jump to Account", list(DATA.keys()))
 if view_option != "Portfolio Overview":
-    selected_customer = st.sidebar.selectbox("Account", list(DATA.keys()))
     cust = DATA[selected_customer]
 
 # =============================================================================
@@ -551,8 +550,35 @@ elif view_option == "Adoption & Utilization":
 elif view_option == "KPI Reports":
     st.markdown(f"### 🎯 Key Performance Indicator (KPI) Report: {selected_customer}")
     st.caption("Tracking contractually aligned outcome benchmarks and platform health metrics")
-    st.write("")
 
+    kpi_pcts = [kpi_performance_pct(k["value_num"], k["target_num"], k["lower_is_better"]) for k in cust["kpis"]]
+    kpi_names = [k["metric"] for k in cust["kpis"]]
+    kpi_colors = ["#059669" if p >= 100 else ("#D97706" if p >= 80 else "#DC2626") for p in kpi_pcts]
+
+    cchart1, cchart2 = st.columns(2)
+    with cchart1:
+        st.markdown("#### 📊 Performance vs. Target")
+        fig_kpi_bar = px.bar(
+            x=kpi_pcts, y=kpi_names, orientation="h", text=[f"{p}%" for p in kpi_pcts],
+            color=kpi_names, color_discrete_sequence=kpi_colors
+        )
+        fig_kpi_bar.add_vline(x=100, line_dash="dash", line_color="#64748B")
+        fig_kpi_bar.update_traces(textposition="outside")
+        fig_kpi_bar.update_layout(showlegend=False, height=300, margin=dict(t=20, b=20, l=20, r=20),
+                                   xaxis_title="% of Target", yaxis_title="")
+        st.plotly_chart(fig_kpi_bar, use_container_width=True)
+
+    with cchart2:
+        st.markdown("#### 🥧 KPI Status Mix")
+        status_counts = pd.Series([k["status"].split(" ", 1)[1] for k in cust["kpis"]]).value_counts()
+        fig_kpi_pie = px.pie(
+            names=status_counts.index, values=status_counts.values, hole=0.4,
+            color=status_counts.index, color_discrete_sequence=kpi_colors
+        )
+        fig_kpi_pie.update_layout(height=300, margin=dict(t=20, b=20, l=20, r=20))
+        st.plotly_chart(fig_kpi_pie, use_container_width=True)
+
+    st.divider()
     for kpi in cust["kpis"]:
         pct = kpi_performance_pct(kpi["value_num"], kpi["target_num"], kpi["lower_is_better"])
         bar_color = "#059669" if pct >= 100 else ("#D97706" if pct >= 80 else "#DC2626")
@@ -595,6 +621,32 @@ elif view_option == "Escalations":
     st.markdown(f"### 🚨 Active Escalations & Issue Tracking: {selected_customer}")
     st.caption("Log of critical support tickets, product issues, and operational blockers")
 
+    esc_c1, esc_c2 = st.columns(2)
+    priority_order = ["🔴 Critical", "🔴 High", "🟡 Medium", "🟢 Low"]
+    priority_colors = {"🔴 Critical": "#7F1D1D", "🔴 High": "#DC2626", "🟡 Medium": "#D97706", "🟢 Low": "#059669"}
+
+    with esc_c1:
+        st.markdown("#### 🥧 By Priority")
+        pr_counts = pd.Series([e["priority"] for e in cust["escalations"]]).value_counts()
+        fig_esc_pie = px.pie(
+            names=pr_counts.index, values=pr_counts.values, hole=0.4,
+            color=pr_counts.index, color_discrete_map=priority_colors
+        )
+        fig_esc_pie.update_layout(height=280, margin=dict(t=20, b=20, l=20, r=20))
+        st.plotly_chart(fig_esc_pie, use_container_width=True)
+
+    with esc_c2:
+        st.markdown("#### 📊 By Status")
+        st_counts = pd.Series([e["status"] for e in cust["escalations"]]).value_counts()
+        fig_esc_bar = px.bar(
+            x=st_counts.values, y=st_counts.index, orientation="h", text=st_counts.values,
+            color_discrete_sequence=["#2563EB"]
+        )
+        fig_esc_bar.update_traces(textposition="outside")
+        fig_esc_bar.update_layout(height=280, margin=dict(t=20, b=20, l=20, r=20), xaxis_title="Count", yaxis_title="")
+        st.plotly_chart(fig_esc_bar, use_container_width=True)
+
+    st.divider()
     esc_view = st.radio("Display as", ["Cards", "Table"], horizontal=True, label_visibility="collapsed")
     st.markdown("<br>", unsafe_allow_html=True)
 
