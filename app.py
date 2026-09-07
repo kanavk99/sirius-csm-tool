@@ -202,7 +202,9 @@ DATA = {
         ],
         "escalations": [
             {"id": "ESC-1092", "priority": "🟡 Medium", "issue": "Bulk ATS candidate export sync delay during peak volume hours.", "status": "In Progress", "owner": "Engineering Lead"},
-            {"id": "ESC-1045", "priority": "🟢 Low", "issue": "Custom role taxonomy request for quick-commerce operational leads.", "status": "Resolved", "owner": "CSM Team"}
+            {"id": "ESC-1045", "priority": "🟢 Low", "issue": "Custom role taxonomy request for quick-commerce operational leads.", "status": "Resolved", "owner": "CSM Team"},
+            {"id": "ESC-1241", "priority": "🟡 Medium", "issue": "Candidates on Safari mobile see a blank screen during the coding assessment step; reproducible on iOS 17, affects ~8% of test-takers.", "status": "In Progress", "owner": "Frontend Team"},
+            {"id": "ESC-1296", "priority": "🟡 Medium", "issue": "New hiring managers were not granted platform access after the Q3 org restructure; 12 open reqs have no assigned evaluator.", "status": "In Progress", "owner": "CSM Team"}
         ],
         "events": "Q2 earnings revealed 28% growth in quick-commerce segment (Blinkit).",
         "hiring": "Massive hiring spree across NCR & Bengaluru for logistics automation roles.",
@@ -250,7 +252,9 @@ DATA = {
         ],
         "escalations": [
             {"id": "ESC-1120", "priority": "🔴 High", "issue": "Mobile login timeouts reported by regional store leads in West Zone.", "status": "Under Investigation", "owner": "DevOps / Support"},
-            {"id": "ESC-1088", "priority": "🟡 Medium", "issue": "Franchise portal reporting mismatch on store completion status.", "status": "In Progress", "owner": "Product Support"}
+            {"id": "ESC-1088", "priority": "🟡 Medium", "issue": "Franchise portal reporting mismatch on store completion status.", "status": "In Progress", "owner": "Product Support"},
+            {"id": "ESC-1252", "priority": "🔴 High", "issue": "Client was invoiced for 300 licenses but their signed order form specifies 260; finance team is withholding payment pending correction.", "status": "Pending Finance Review", "owner": "Billing / Deal Desk"},
+            {"id": "ESC-1307", "priority": "🟢 Low", "issue": "L&D team requested a live re-training session after 3 new regional managers reported confusion navigating the reporting dashboard.", "status": "Scheduled", "owner": "Customer Education"}
         ],
         "events": "Announced nationwide digital drive-thru and self-ordering kiosk upgrades.",
         "hiring": "Frontline digital literacy upskilling drives across regional franchises.",
@@ -298,7 +302,9 @@ DATA = {
         ],
         "escalations": [
             {"id": "ESC-1155", "priority": "🔴 Critical", "issue": "Lack of admin access after Champion departure stalled EV module deployment.", "status": "Pending Client Action", "owner": "Account Director"},
-            {"id": "ESC-1102", "priority": "🔴 High", "issue": "Security compliance audit flag on multi-tenant deployment model.", "status": "Under Review", "owner": "InfoSec Team"}
+            {"id": "ESC-1102", "priority": "🔴 High", "issue": "Security compliance audit flag on multi-tenant deployment model.", "status": "Under Review", "owner": "InfoSec Team"},
+            {"id": "ESC-1274", "priority": "🔴 Critical", "issue": "Security team flagged that candidate PII was included in a debug log accessible to internal support staff; requires immediate audit and data purge.", "status": "Under Investigation", "owner": "InfoSec / Legal"},
+            {"id": "ESC-1318", "priority": "🔴 High", "issue": "No clear internal owner has stepped in since the Champion's departure; platform usage has dropped 30% in 2 weeks.", "status": "Pending Client Action", "owner": "Account Director"}
         ],
         "events": "EV shift mandate initiated across R&D and assembly plants.",
         "hiring": "Hiring freeze on traditional IC engine roles; hiring surge for EV software engineers.",
