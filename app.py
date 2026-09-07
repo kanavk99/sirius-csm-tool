@@ -89,10 +89,10 @@ selected_customer = st.sidebar.selectbox(
     ["Zomato", "McDonald's", "Honda"]
 )
 
-# Secondary Dropdown under Customer Name
+# Added 'Adoption & Utilization' into the Dropdown List
 view_option = st.sidebar.selectbox(
     f"2. Select View for {selected_customer}",
-    ["Executive Overview", "KPI Reports", "Surveys & Feedback"]
+    ["Executive Overview", "Adoption & Utilization", "KPI Reports", "Surveys & Feedback"]
 )
 
 # Comprehensive Dataset
@@ -105,6 +105,7 @@ DATA = {
         "stage": "Expansion Phase",
         "adoption_rate": "84%",
         "active_licenses": "420 / 500",
+        "license_utilization": "84.0%",
         "stakeholders": {
             "Decision-maker": "ABC (Chief Operating Officer)",
             "Influencer": "XYZ (VP of Product Engineering)",
@@ -145,6 +146,7 @@ DATA = {
         "stage": "Adoption Phase",
         "adoption_rate": "62%",
         "active_licenses": "186 / 300",
+        "license_utilization": "62.0%",
         "stakeholders": {
             "Decision-maker": "ABC (Chief HR Officer)",
             "Influencer": "XYZ (Director of Franchise Operations)",
@@ -185,6 +187,7 @@ DATA = {
         "stage": "Renewal at Risk",
         "adoption_rate": "45%",
         "active_licenses": "225 / 500",
+        "license_utilization": "45.0%",
         "stakeholders": {
             "Decision-maker": "ABC (Managing Director - Supply Chain)",
             "Influencer": "XYZ (VP of Manufacturing)",
@@ -274,7 +277,8 @@ if view_option == "Executive Overview":
 
     st.divider()
 
-    st.markdown("### 📈 3. Customer Intelligence Analytics & Adoption")
+    # REMOVED ADOPTION METRICS BLOCK FROM THIS SECTION AS REQUESTED
+    st.markdown("### 📈 3. Customer Intelligence Analytics")
     chart_col1, chart_col2 = st.columns(2)
 
     with chart_col1:
@@ -286,22 +290,16 @@ if view_option == "Executive Overview":
             color_discrete_map={"Decision-makers": "#2563EB", "Influencers": "#059669", "Champions": "#D97706", "Users": "#7C3AED", "Blockers": "#DC2626"},
             hole=0.4
         )
-        fig_pie.update_layout(margin=dict(t=20, b=20, l=20, r=20), height=260)
+        fig_pie.update_layout(margin=dict(t=20, b=20, l=20, r=20), height=280)
         st.plotly_chart(fig_pie, use_container_width=True)
 
     with chart_col2:
-        st.markdown(f"#### 📊 5-Month Usage & Adoption Trend")
-        
-        # Display Adoption Metrics Top
-        m1, m2 = st.columns(2)
-        m1.metric("Current Adoption Rate", cust["adoption_rate"])
-        m2.metric("Active Seat Licenses", cust["active_licenses"])
-        
+        st.markdown("#### 📊 5-Month Usage Trend")
         bar_df = pd.DataFrame({"Month": cust["usage_months"], "Engagement Score": cust["usage_scores"]})
         bar_color = "#059669" if cust["health_score"] >= 75 else ("#D97706" if cust["health_score"] >= 60 else "#DC2626")
         fig_bar = px.bar(bar_df, x="Month", y="Engagement Score", text="Engagement Score", color_discrete_sequence=[bar_color])
         fig_bar.update_traces(textposition='outside')
-        fig_bar.update_layout(yaxis_range=[0, 100], margin=dict(t=20, b=20, l=20, r=20), height=220)
+        fig_bar.update_layout(yaxis_range=[0, 100], margin=dict(t=20, b=20, l=20, r=20), height=280)
         st.plotly_chart(fig_bar, use_container_width=True)
 
     st.divider()
@@ -333,14 +331,37 @@ if view_option == "Executive Overview":
         </div>
     """, unsafe_allow_html=True)
 
-# VIEW 2: KPI REPORTS
+# NEW VIEW ADDED TO DROPDOWN LIST: ADOPTION & UTILIZATION
+elif view_option == "Adoption & Utilization":
+    st.markdown(f"### 📈 Platform Adoption & Seat Utilization: {selected_customer}")
+    st.caption("Detailed breakdown of account adoption rate, license allocation, and 5-month engagement trends.")
+    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Overall Adoption Rate", cust["adoption_rate"])
+    col2.metric("Active Seat Licenses", cust["active_licenses"])
+    col3.metric("License Utilization Rate", cust["license_utilization"])
+
+    st.divider()
+
+    st.markdown("#### 📊 5-Month Usage & Adoption Trend Chart")
+    bar_df = pd.DataFrame({"Month": cust["usage_months"], "Engagement Score": cust["usage_scores"]})
+    bar_color = "#059669" if cust["health_score"] >= 75 else ("#D97706" if cust["health_score"] >= 60 else "#DC2626")
+    fig_bar = px.bar(bar_df, x="Month", y="Engagement Score", text="Engagement Score", color_discrete_sequence=[bar_color])
+    fig_bar.update_traces(textposition='outside')
+    fig_bar.update_layout(yaxis_range=[0, 100], height=350)
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+    st.markdown(f"""
+        <div class="card-box">
+            <h4 style="margin-top:0;">💡 Adoption Telemetry Brief</h4>
+            <p style="margin-bottom:0;">{cust['usage']}</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+# VIEW 3: KPI REPORTS
 elif view_option == "KPI Reports":
     st.markdown(f"### 🎯 Key Performance Indicator (KPI) Report: {selected_customer}")
     st.caption("Tracking contractually aligned outcome benchmarks and platform health metrics")
-    
-    col1, col2 = st.columns(2)
-    col1.metric("Overall Account Adoption Rate", cust["adoption_rate"])
-    col2.metric("License Allocation", cust["active_licenses"])
     
     st.write("")
     for kpi in cust["kpis"]:
@@ -356,7 +377,7 @@ elif view_option == "KPI Reports":
             </div>
         """, unsafe_allow_html=True)
 
-# VIEW 3: SURVEYS & FEEDBACK
+# VIEW 4: SURVEYS & FEEDBACK
 elif view_option == "Surveys & Feedback":
     st.markdown(f"### 📋 Customer Surveys & Voice of Customer (VoC): {selected_customer}")
     st.caption("Aggregated NPS, CSAT, and direct qualitative stakeholder feedback")
