@@ -1,9 +1,6 @@
-import os
 import streamlit as st
-from google import genai
-from google.genai import types
 
-# Page Config
+# Page Configuration
 st.set_page_config(
     page_title="Sirius | Enterprise Customer Intelligence",
     page_icon="⚡",
@@ -13,180 +10,215 @@ st.set_page_config(
 # Custom Styling
 st.markdown("""
     <style>
-    .main-header { font-size: 2.2rem; font-weight: 700; color: #1E293B; margin-bottom: 0px; }
-    .sub-header { font-size: 1rem; color: #64748B; margin-bottom: 25px; }
-    .card { background-color: #F8FAFC; padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; margin-bottom: 15px; }
+    .sirius-header {
+        background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
+        color: #FFFFFF;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .sirius-title { font-size: 2.4rem; font-weight: 800; color: #38BDF8; margin: 0; }
+    .sirius-subtitle { font-size: 1.05rem; color: #94A3B8; margin-top: 5px; }
+    .card-box {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
     .badge-risk { background-color: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
     .badge-growth { background-color: #DCFCE7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
     .badge-insight { background-color: #E0F2FE; color: #075985; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+    .ai-box {
+        background-color: #F0FDF4;
+        border-left: 4px solid #16A34A;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Title & Subtitle
-st.markdown('<div class="main-header">⚡ Sirius — Customer Intelligence Tool</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Empowering CSMs with real-time organizational signals and proactive value-add outreach.</div>', unsafe_allow_html=True)
+# Main Banner Header
+st.markdown("""
+    <div class="sirius-header">
+        <div class="sirius-title">⚡ SIRIUS</div>
+        <div class="sirius-subtitle">Enterprise Customer Intelligence & Stakeholder Mapping Dashboard</div>
+    </div>
+""", unsafe_allow_html=True)
 
-# Sidebar Configuration
-st.sidebar.title("📌 Navigation & Settings")
-account_option = st.sidebar.selectbox(
-    "Select Enterprise Account",
-    ["TechCorp India (Sample)", "GlobalLogistics Ltd (Sample)", "Custom Account Search"]
+# Sidebar Controls
+st.sidebar.title("🏢 Select Account")
+selected_customer = st.sidebar.selectbox(
+    "Choose Enterprise Customer",
+    ["Zomato", "McDonald's", "Honda"]
 )
 
-# Initialize Gemini Client if API key is present
-api_key = st.sidebar.text_input("Gemini API Key (Optional for Live Analysis)", type="password")
-client = None
-if api_key:
-    client = genai.Client(api_key=api_key)
-elif "GEMINI_API_KEY" in os.environ:
-    client = genai.Client()
-
-# Sample Data Store
-SAMPLE_DATA = {
-    "TechCorp India (Sample)": {
-        "domain": "techcorp.in",
-        "arr": "$250,000",
-        "health_score": "82 (Healthy)",
-        "renewal_date": "Nov 15, 2026",
-        "internal_updates": [
-            {"type": "GROWTH", "title": "Rapid Expansion", "desc": "Opened a new tech hub in Bengaluru, hiring 150+ engineers."},
-            {"type": "RISK", "title": "Executive Departure", "desc": "VP of Engineering (Primary Champion) transitioned out last week."},
-            {"type": "INSIGHT", "title": "Usage Spike", "desc": "Assessment completions increased by 35% in Q2 across DevOps teams."}
-        ],
-        "insight_today": "TechCorp is scaling their tech hiring in Bengaluru. Share how Hunar.AI's automated coding evaluations cut candidate screening time by 40% for regional hiring sprees."
+# Comprehensive Dataset
+DATA = {
+    "Zomato": {
+        "acv": "$350,000",
+        "health": "🟢 88 (Healthy)",
+        "renewal": "Nov 2026",
+        "stage": "Expansion Phase",
+        "stakeholders": {
+            "Decision-maker": "ABC (Chief Operating Officer)",
+            "Influencer": "XYZ (VP of Product Engineering)",
+            "Champion": "PQR (Head of Talent Acquisition)",
+            "User": "LMN (Technical Recruiting Lead)",
+            "Blocker": "STU (IT Security Compliance Lead)"
+        },
+        "events": "Q2 earnings revealed 28% growth in quick-commerce segment (Blinkit).",
+        "hiring": "Massive hiring spree across NCR & Bengaluru for logistics automation roles.",
+        "leadership": "XYZ promoted to VP of Product Engineering; previous Head of Talent ABC transitioned out.",
+        "news": "Launching fresh quick-delivery dark stores in 15 new tier-2 cities.",
+        "usage": "Assessment volume increased by 42% YoY; high adoption in tech screening.",
+        "risks_opps": "Opportunity: Upsell Hunar.AI automated candidate evaluation for regional logistics staff.",
+        "ai_analysis": {
+            "what": "Zomato expands quick-commerce delivery network to 15 tier-2 cities.",
+            "why": "Requires rapid onboarding of local operations and technical fleet leads.",
+            "action": "Propose an automated regional assessment framework to scale hiring quality.",
+            "talking_point": "'Congratulations on the expansion into tier-2 markets! To support this speed, we can deploy pre-configured evaluation templates so your team screens candidate cohorts in under 24 hours.'"
+        }
     },
-    "GlobalLogistics Ltd (Sample)": {
-        "domain": "globallogistics.com",
-        "arr": "$180,000",
-        "health_score": "64 (At-Risk)",
-        "renewal_date": "Oct 30, 2026",
-        "internal_updates": [
-            {"type": "RISK", "title": "Low Platform Engagement", "desc": "Active manager logins dropped by 22% over the last 30 days."},
-            {"type": "GROWTH", "title": "Digital Transformation Mandate", "desc": "CEO announced a company-wide shift to AI-driven operations in Q3 earnings call."},
-            {"type": "INSIGHT", "title": "Upskilling Need", "desc": "Supply chain team requires rapid re-skilling on warehouse management tools."}
-        ],
-        "insight_today": "Align with the CEO's AI initiative. Offer a custom skill-gap assessment benchmark tailored to supply chain digital transformation."
+    "McDonald's": {
+        "acv": "$220,000",
+        "health": "🟡 68 (Stable)",
+        "renewal": "Oct 2026",
+        "stage": "Adoption Phase",
+        "stakeholders": {
+            "Decision-maker": "ABC (Chief HR Officer)",
+            "Influencer": "XYZ (Director of Franchise Operations)",
+            "Champion": "PQR (Learning & Development Specialist)",
+            "User": "LMN (Store Operations Manager)",
+            "Blocker": "STU (Procurement Specialist)"
+        },
+        "events": "Announced nationwide digital drive-thru and self-ordering kiosk upgrades.",
+        "hiring": "Frontline digital literacy upskilling drives across regional franchises.",
+        "leadership": "ABC appointed as CHRO to lead franchise digital workforce capability.",
+        "news": "Strategic partnership announced to integrate automated drive-thru ordering.",
+        "usage": "Platform login activity down 18% over the last 45 days in west zone.",
+        "risks_opps": "Risk: Low manager engagement; Opportunity: Align Hunar.AI with digital kiosk upskilling.",
+        "ai_analysis": {
+            "what": "Manager platform engagement dropped 18% during store digital upgrades.",
+            "why": "Store leads are overloaded with kiosk rollouts and neglecting routine assessments.",
+            "action": "Schedule a 15-minute executive review with CHRO ABC to streamline store manager workflows.",
+            "talking_point": "'We noticed store teams are focused on kiosk upgrades. We created a 3-minute mobile assessment model so managers can verify team digital skills without taking time away from store operations.'"
+        }
+    },
+    "Honda": {
+        "acv": "$410,000",
+        "health": "🔴 52 (At-Risk)",
+        "renewal": "Dec 2026",
+        "stage": "Renewal at Risk",
+        "stakeholders": {
+            "Decision-maker": "ABC (Managing Director - Supply Chain)",
+            "Influencer": "XYZ (VP of Manufacturing)",
+            "Champion": "PQR (Corporate Training Lead)",
+            "User": "LMN (Factory HR Manager)",
+            "Blocker": "STU (Enterprise Software Auditor)"
+        },
+        "events": "EV shift mandate initiated across R&D and assembly plants.",
+        "hiring": "Hiring freeze on traditional IC engine roles; hiring surge for EV software engineers.",
+        "leadership": "Primary Champion PQR departed; interim HR team evaluating software vendors.",
+        "news": "Pivoting $1B manufacturing budget to electric vehicle and battery plant assembly.",
+        "usage": "License utilization at 45%; platform usage restricted to assembly divisions.",
+        "risks_opps": "Risk: Champion loss + low utilization; Opportunity: Re-align platform to EV software team.",
+        "ai_analysis": {
+            "what": "Primary champion PQR departed amidst company pivot to EV manufacturing.",
+            "why": "Risk of non-renewal due to lack of central ownership and low usage.",
+            "action": "Reach out to Decision-maker ABC to align Hunar.AI with the new EV software hiring mandate.",
+            "talking_point": "'With Honda's shift to EV production, we want to ensure Hunar.AI directly supports your new EV software engineering hiring goals. Let's align on a refreshed skill taxonomy for your R&D teams.'"
+        }
     }
 }
 
-# Account Details Context
-if account_option in SAMPLE_DATA:
-    data = SAMPLE_DATA[account_option]
-    company_name = account_option.split(" (")[0]
-    domain = data["domain"]
-    arr = data["arr"]
-    health = data["health_score"]
-    renewal = data["renewal_date"]
-    updates = data["internal_updates"]
-    insight_today = data["insight_today"]
-else:
-    company_name = st.text_input("Enter Enterprise Name", "Infosys")
-    domain = st.text_input("Enter Company Domain", "infosys.com")
-    arr = "$300,000"
-    health = "78 (Stable)"
-    renewal = "Dec 31, 2026"
-    updates = [
-        {"type": "INSIGHT", "title": "Custom Account Mode", "desc": "Enter API key in sidebar to fetch live AI intelligence."}
-    ]
-    insight_today = f"Analyze public signals for {company_name} to generate proactive value."
+cust = DATA[selected_customer]
 
-# Top Metrics Row
+# SECTION 1: CUSTOMER OVERVIEW & HEALTH
+st.markdown("### 📊 1. Customer Overview & Health Status")
 col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric("Account Name", company_name)
-with col2:
-    st.metric("Annual Contract Value", arr)
-with col3:
-    st.metric("Account Health Score", health)
-with col4:
-    st.metric("Renewal Date", renewal)
+col1.metric("Customer Name", selected_customer)
+col2.metric("Annual Contract Value", cust["acv"])
+col3.metric("Health Score", cust["health"])
+col4.metric("Renewal / Stage", f"{cust['renewal']} | {cust['stage']}")
 
 st.divider()
 
-# Main Layout: Two Columns
-left_col, right_col = st.columns([1, 1])
+# SECTION 2: ENTERPRISE STAKEHOLDER MATRIX
+st.markdown("### 👥 2. Enterprise Stakeholder Mapping")
+st.caption("Mapped roles and internal influence structure")
 
-with left_col:
-    st.subheader("🔍 What is happening inside my customer's organization?")
-    st.caption("Internal telemetry + External organizational signals")
+stk = cust["stakeholders"]
+s_col1, s_col2, s_col3, s_col4, s_col5 = st.columns(5)
+s_col1.info(f"**Decision-Maker**\n\n{stk['Decision-maker']}")
+s_col2.success(f"**Influencer**\n\n{stk['Influencer']}")
+s_col3.warning(f"**Champion**\n\n{stk['Champion']}")
+s_col4.metric("Users", stk['User'])
+s_col5.error(f"**Blocker**\n\n{stk['Blocker']}")
 
-    for item in updates:
-        badge_class = f"badge-{item['type'].lower()}"
-        st.markdown(f"""
-            <div class="card">
-                <span class="{badge_class}">{item['type']}</span>
-                <h4 style="margin-top: 8px; margin-bottom: 4px;">{item['title']}</h4>
-                <p style="color: #475569; margin-bottom: 0;">{item['desc']}</p>
-            </div>
-        """, unsafe_allow_html=True)
+st.divider()
 
-    if client and st.button("✨ Fetch Live AI Intelligence Signals"):
-        with st.spinner(f"Analyzing public signals and news for {company_name}..."):
-            try:
-                prompt = f"""
-                Act as an Enterprise Customer Success Manager intelligence tool.
-                Provide 3 concise strategic updates about the company '{company_name}' ({domain}).
-                Categorize each update as either RISK, GROWTH, or INSIGHT.
-                Focus on hiring trends, executive moves, technology adoption, or strategic shifts.
-                Format as bullet points with category titles.
-                """
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt
-                )
-                st.markdown("### 🌐 Live Web Intelligence Summary")
-                st.info(response.text)
-            except Exception as e:
-                st.error(f"Error fetching live updates: {str(e)}")
+# SECTION 3: ORGANIZATIONAL SIGNALS & TELEMETRY
+st.markdown("### 📡 3. Recent Company & Organizational Signals")
 
-with right_col:
-    st.subheader("💡 What useful insight can I share today?")
-    st.caption("Proactive value-add outreach generator")
+grid_col1, grid_col2 = st.columns(2)
 
-    st.markdown(f"""
-        <div class="card" style="background-color: #EFF6FF; border-color: #BFDBFE;">
-            <h4 style="color: #1E40AF; margin-top: 0;">Strategic Recommendation</h4>
-            <p style="color: #1E3A8A; font-size: 0.95rem;">{insight_today}</p>
+with grid_col1:
+    st.markdown("""
+        <div class="card-box">
+            <h4>🏢 Recent Company Events & News</h4>
+            <p>{}</p>
+            <p><strong>Strategic Developments:</strong> {}</p>
         </div>
-    """, unsafe_allow_html=True)
+    """.format(cust["events"], cust["news"]), unsafe_allow_html=True)
 
-    st.subheader("📧 Generate Executive Outreach Draft")
-    outreach_type = st.selectbox(
-        "Select Goal",
-        ["Proactive Insight / Value Share", "Champion Departure Re-alignment", "Quarterly Value Review Booking"]
-    )
+    st.markdown("""
+        <div class="card-box">
+            <h4>👔 Leadership Changes & Hiring</h4>
+            <p><strong>Leadership Shifts:</strong> {}</p>
+            <p><strong>Hiring Signals:</strong> {}</p>
+        </div>
+    """.format(cust["leadership"], cust["hiring"]), unsafe_allow_html=True)
 
-    if st.button("🚀 Draft Personalized Email"):
-        if client:
-            with st.spinner("Drafting value-focused email..."):
-                prompt = f"""
-                Write a concise, highly professional executive email from a Customer Success Manager at Hunar.AI to a key decision-maker at {company_name}.
-                Goal: {outreach_type}
-                Context/Insight: {insight_today}
-                Tone: Value-driven, consultative, non-salesy.
-                Keep it under 150 words.
-                """
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt
-                )
-                st.text_area("Generated Outreach", response.text, height=220)
-        else:
-            # Fallback static draft if no API key provided
-            sample_email = f"""Subject: Quick thought on {company_name}'s recent technical scaling
+with grid_col2:
+    st.markdown("""
+        <div class="card-box">
+            <h4>📈 Product & Customer Usage Signals</h4>
+            <p>{}</p>
+        </div>
+    """.format(cust["usage"]), unsafe_allow_html=True)
 
-Hi Team,
-
-Noticed {company_name}'s recent initiative around expanding technical teams in region.
-
-When similar enterprise clients scale hiring rapidly, candidate screening bottlenecks often become a key friction point. We recently benchmarked how automated skill assessments reduced evaluation cycles by 40% while keeping quality high.
-
-I put together a brief 2-page benchmark report tailored to your current stack—happy to share it over if useful.
-
-Best regards,
-Kanav Kundra
-Customer Success Manager | Hunar.AI"""
-            st.text_area("Generated Outreach (Sample)", sample_email, height=220)
+    st.markdown("""
+        <div class="card-box" style="border-left: 4px solid #EF4444;">
+            <h4>⚠️ Risks & Growth Opportunities</h4>
+            <p>{}</p>
+        </div>
+    """.format(cust["risks_opps"]), unsafe_allow_html=True)
 
 st.divider()
-st.caption("Sirius Customer Intelligence Dashboard — Prepared for Hunar.AI CSM Assessment")
+
+# SECTION 4: AI INSIGHT ENGINE
+st.markdown("### 🤖 4. AI Insight Engine")
+st.caption("Actionable recommendations derived from signal intelligence")
+
+ai = cust["ai_analysis"]
+
+st.markdown(f"""
+    <div class="ai-box">
+        <span class="badge-insight">STRATEGIC ACTIONABLE INSIGHT</span>
+        <h3 style="color: #15803D; margin-top: 10px; margin-bottom: 10px;">Signal Briefing: {selected_customer}</h3>
+        <p><strong>1. What Happened:</strong> {ai['what']}</p>
+        <p><strong>2. Why It Matters:</strong> {ai['why']}</p>
+        <p><strong>3. Recommended CSM Action:</strong> {ai['action']}</p>
+        <div style="background-color: #FFFFFF; padding: 12px; border-radius: 6px; border: 1px dashed #16A34A; margin-top: 10px;">
+            <p style="margin: 0; color: #166534;"><strong>💬 Suggested Talking Point / Outreach Draft:</strong></p>
+            <p style="margin: 5px 0 0 0; font-style: italic; color: #334155;">{ai['talking_point']}</p>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+st.divider()
+st.caption("Sirius Customer Intelligence Tool — Built for Hunar.AI CSM Assessment | Kanav Kundra")
