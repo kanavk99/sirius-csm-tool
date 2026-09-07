@@ -337,7 +337,7 @@ st.markdown(f"""
 # =============================================================================
 # SIDEBAR
 # =============================================================================
-st.sidebar.title("🏢 Select Account")
+st.sidebar.title("🏢 Accounts")
 
 # Quick triage badges for every account, always visible
 for name, d in DATA.items():
